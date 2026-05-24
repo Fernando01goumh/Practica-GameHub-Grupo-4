@@ -1,16 +1,19 @@
-USE GameHubDB;
+-- ============================================================
+-- GAME-HUB & SERVICES ECOSYSTEM - POSTGRESQL (Grupo 4)
+-- INSERCIÓN DE DATOS DE PRUEBA (DATASET OFICIAL)
+-- ============================================================
 
 -- Insertar Idiomas (Solo Español e Inglés según el CHECK)
-insert into idioma (id_idioma, nombre) values
-('ID_ESP', 'Español'),
-('ID_ENG', 'Inglés');
+INSERT INTO IDIOMA (id_idioma, nombre) VALUES
+('idioma_es', 'Español'),
+('idioma_en', 'Inglés');
 
 -- Insertar Roles (Según el CHECK)
 INSERT INTO ROL (id_rol, nombre) VALUES 
-('ROL_ADMIN', 'Administrador'),
-('ROL_REDAC', 'Redactor'),
-('ROL_COLAB', 'Colaborador'),
-('ROL_SUSCR', 'Suscriptor');
+('rol_admin', 'Administrador'),
+('rol_red', 'Redactor'),
+('rol_col', 'Colaborador'),
+('rol_sus', 'Suscriptor');
 
 -- Insertar Eventos (fecha_fin >= fecha_inicio)
 INSERT INTO EVENTO (id_evento, nombre, descripcion, fecha_inicio, fecha_fin) VALUES 
@@ -30,10 +33,11 @@ INSERT INTO VIDEOJUEGO (id_videojuego, titulo, descripcion, nota_prensa, nota_co
 ('VJ_RE2_REMAKE', 'Resident Evil 2 Remake', 'Remake del clásico survival horror de Capcom en Raccoon City.', 91, 90, '2019-01-25', 'https://upload.wikimedia.org/wikipedia/en/f/fd/Resident_Evil_2_Remake.jpg');
 
 -- Insertar Usuarios (username alfanumérico, email válido, password >= 8 chars)
+-- NOTA: Se asocian a los IDs reales de IDIOMA y ROL para evitar errores de clave foránea.
 INSERT INTO USUARIO (id_usuario, nombre, username, biografia, email, password, foto_perfil, id_idioma, id_rol) VALUES 
-('USR_001', 'Ana López', 'analopez88', 'Apasionada de los RPG.', 'ana@gamehub.com', 'AdminPass123', 'https://ui-avatars.com/api/?name=Ana+Lopez', 'ID_ESP', 'ROL_ADMIN'),
-('USR_002', 'David Ruiz', 'davidGamer', 'Me encantan los shooters.', 'david@email.com', 'PasswordSegura', 'https://ui-avatars.com/api/?name=David+Ruiz', 'ID_ESP', 'ROL_REDAC'),
-('USR_003', 'Michael Smith', 'mikeGamer99', 'English speaker, love RPGs.', 'michael@email.com', 'Mike12345678', 'https://ui-avatars.com/api/?name=Michael+Smith', 'ID_ENG', 'ROL_SUSCR');
+('USR_001', 'Ana López', 'analopez88', 'Apasionada de los RPG.', 'ana@gamehub.com', 'AdminPass123', 'https://ui-avatars.com/api/?name=Ana+Lopez', 'idioma_es', 'rol_admin'),
+('USR_002', 'David Ruiz', 'davidGamer', 'Me encantan los shooters.', 'david@email.com', 'PasswordSegura', 'https://ui-avatars.com/api/?name=David+Ruiz', 'idioma_es', 'rol_red'),
+('USR_003', 'Michael Smith', 'mikeGamer99', 'English speaker, love RPGs.', 'michael@email.com', 'Mike12345678', 'https://ui-avatars.com/api/?name=Michael+Smith', 'idioma_en', 'rol_sus');
 
 -- Insertar Recursos Multimedia (tipo válido, url empieza con http)
 INSERT INTO RECURSO_MULTIMEDIA (id_recurso, id_videojuego, titulo, tipo, autor_externo, plataforma_origen, fecha_publicacion, url_recurso) VALUES 
@@ -49,26 +53,24 @@ INSERT INTO GENERO (id_videojuego, genero) VALUES
 ('VJ_ELDENRING', 'RPG'),
 ('VJ_RE2_REMAKE', 'Terror');
 
--- Insertar Publicaciones (tipo válido, título >= 5 chars)
-INSERT INTO PUBLICACION (id_publicacion, titulo, contenido, tipo, fecha_publicacion, id_usuario) VALUES 
-('PUB_001', 'Análisis de Zelda TOTK', 'Este es un análisis detallado del juego...', 'Análisis', '2023-05-15', 'USR_002'),
-('PUB_002', 'Guía para Cyberpunk', 'Cómo conseguir dinero rápido en Night City...', 'Guía', '2021-01-10', 'USR_002');
+-- Insertar Publicaciones (se incluye la imagen de portada como NULL y el estado usa el DEFAULT 'publicado')
+INSERT INTO PUBLICACION (id_publicacion, titulo, contenido, tipo, fecha_publicacion, id_usuario, imagen_portada) VALUES 
+('PUB_001', 'Análisis de Zelda TOTK', 'Este es un análisis detallado del juego...', 'Análisis', '2023-05-15', 'USR_002', NULL),
+('PUB_002', 'Guía para Cyberpunk', 'Cómo conseguir dinero rápido en Night City...', 'Guía', '2021-01-10', 'USR_002', NULL);
 
 -- Insertar Comentarios (contenido >= 1 char)
 INSERT INTO COMENTARIO (id_comentario, id_publicacion, id_usuario, contenido, fecha_publicacion) VALUES 
 ('COM_001', 'PUB_001', 'USR_003', 'Great review! I totally agree.', '2023-05-16'),
 ('COM_002', 'PUB_002', 'USR_001', '¡Muy útil la guía, gracias!', '2021-01-11');
 
--- Relacionar Videojuegos con Eventos
-INSERT INTO INCLUYE (id_videojuego, id_evento) VALUES 
-('VJ_ZELDA_TOTK', 'EV_GAMEA_25'),
-('VJ_ELDENRING', 'EV_GAMEA_25');
+-- Relacionar Videojuegos con Eventos (Ojo: El orden de columnas en la PK unificada es id_evento, id_videojuego)
+INSERT INTO INCLUYE (id_evento, id_videojuego) VALUES 
+('EV_GAMEA_25', 'VJ_ZELDA_TOTK'),
+('EV_GAMEA_25', 'VJ_ELDENRING');
 
 -- Insertar Valoraciones de Usuarios a Videojuegos
-INSERT INTO VALORA (id_videojuego, id_usuario, valoracion) VALUES 
-('VJ_ZELDA_TOTK', 'USR_003', 95),
-('VJ_CYBERPUNK', 'USR_001', 85),
-('VJ_ELDENRING', 'USR_002', 98),
-('VJ_RE2_REMAKE', 'USR_002', 90);
-
-
+INSERT INTO VALORA (id_usuario, id_videojuego, valoracion) VALUES 
+('USR_003', 'VJ_ZELDA_TOTK', 95),
+('USR_001', 'VJ_CYBERPUNK', 85),
+('USR_002', 'VJ_ELDENRING', 98),
+('USR_002', 'VJ_RE2_REMAKE', 90);
